@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Farmer</title>
+    <style>
+        :root {
+            --discord-bg: #36393f;
+            --discord-darker: #2f3136;
+            --discord-light: #40444b;
+            --discord-text: #dcddde;
+            --discord-muted: #72767d;
+            --discord-link: #00b0f4;
+            --discord-green: #43b581;
+            --discord-hover: #32353b;
+            --discord-border: #202225;
+        }
+
+        body {
+            font-family: 'Whitney', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: var(--discord-bg);
+            color: var(--discord-text);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--discord-text);
+            font-size: 32px;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        #search-container {
+            background-color: var(--discord-darker);
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            margin-bottom: 24px;
+            border: 1px solid var(--discord-border);
+        }
+
+        #keyword-input {
+            width: calc(100% - 24px);
+            padding: 12px;
+            font-size: 16px;
+            background-color: var(--discord-light);
+            border: none;
+            border-radius: 4px;
+            color: var(--discord-text);
+            margin-bottom: 16px;
+            transition: background-color 0.2s;
+        }
+
+        #keyword-input:focus {
+            outline: none;
+            background-color: var(--discord-bg);
+            box-shadow: 0 0 0 2px var(--discord-link);
+        }
+
+        .controls-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        #max-pages {
+            width: 80px;
+            padding: 8px;
+            background-color: var(--discord-light);
+            border: none;
+            border-radius: 4px;
+            color: var(--discord-text);
+            font-size: 14px;
+        }
+
+        #search-button {
+            padding: 10px 24px;
+            font-size: 16px;
+            background-color: var(--discord-green);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: filter 0.2s;
+            font-weight: 500;
+        }
+
+        #search-button:hover {
+            filter: brightness(1.1);
+        }
+
+        #results-container {
+            background-color: var(--discord-darker);
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            min-height: 200px;
+            border: 1px solid var(--discord-border);
+        }
+
+        .pdf-link {
+            display: block;
+            padding: 16px;
+            background-color: var(--discord-light);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .pdf-link:hover {
+            background-color: var(--discord-hover);
+        }
+
+        .pdf-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            color: var(--discord-text);
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .pdf-url {
+            color: var(--discord-muted);
+            font-size: 12px;
+            word-break: break-all;
+            margin-bottom: 8px;
+        }
+
+        .relevance-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 500;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--discord-text);
+        }
+
+        #search-status {
+            color: var(--discord-muted);
+            text-align: center;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+
+        .error-message {
+            color: #f04747;
+            text-align: center;
+            padding: 16px;
+            background-color: rgba(240, 71, 71, 0.1);
+            border-radius: 4px;
+            margin: 16px 0;
+        }
+
+        #download-all {
+            padding: 10px 24px;
+            font-size: 16px;
+            background-color: var(--discord-link);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: filter 0.2s;
+            font-weight: 500;
+        }
+
+        #download-all:hover {
+            filter: brightness(1.1);
+        }
+
+        #download-all:disabled {
+            background-color: var(--discord-muted);
+            cursor: not-allowed;
+            filter: none;
+        }
+
+        .download-status {
+            color: var(--discord-muted);
+            font-size: 14px;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: var(--discord-light);
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 20px;
+            transition: width 0.3s ease, background-color 0.3s ease;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Progress bar colors */
+        .progress-red { background-color: #ed4245; }
+        .progress-yellow { background-color: #faa81a; }
+        .progress-blue { background-color: #5865f2; }
+        .progress-green { background-color: var(--discord-green); }
+
+        .progress-wrapper {
+            background-color: var(--discord-darker);
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            margin-bottom: 24px;
+            border: 1px solid var(--discord-border);
+        }
+
+        .download-status-text {
+            text-align: center;
+            margin-top: 8px;
+            color: var(--discord-text);
+        }
+
+        #progress-container {
+            display: none;
+            margin-top: 16px;
+            background-color: var(--discord-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            width: 0;
+            height: 24px;
+            text-align: center;
+            line-height: 24px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        .progress-red {
+            background-color: #f04747;
+        }
+
+        .progress-yellow {
+            background-color: #faa61a;
+        }
+
+        .progress-blue {
+            background-color: var(--discord-link);
+        }
+
+        .progress-green {
+            background-color: var(--discord-green);
+        }
+
+        .download-status-text {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 14px;
+            color: var(--discord-text);
+        }
+    </style>
+</head>
+<body>
+    <h1>PDF Farmer</h1>
+    
+    <div id="search-container">
+        <input type="text" id="keyword-input" placeholder="Enter keyword or topic to search for PDFs...">
+        <div class="controls-row">
+            <div>
+                <label for="max-pages" title="Number of pages to search (1-20)">Pages:</label>
+                <input type="number" id="max-pages" value="1" min="1" max="20">
+            </div>
+            <button id="search-button">🔍 Search PDFs</button>
+            <button id="download-all" disabled style="display: none;">📥 Download All</button>
+        </div>
+    </div>
+
+    <div id="progress-container" style="display: none;" class="progress-wrapper">
+        <div class="progress-container">
+            <div class="progress-bar progress-red"></div>
+        </div>
+        <div class="download-status-text"></div>
+    </div>
+
+    <div id="results-container">
+        <p id="initial-text" style="text-align: center; color: var(--discord-muted);">
+            Enter a keyword above to start searching for PDFs
+        </p>
+        <div id="pdf-results"></div>
+        <div id="progress-container">
+            <div class="progress-bar progress-red">0%</div>
+            <div class="download-status-text"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchButton = document.getElementById('search-button');
+            const resultsContainer = document.getElementById('results-container');
+            const keywordInput = document.getElementById('keyword-input');
+            
+            async function performSearch() {
+                const keyword = keywordInput.value.trim();
+                if (!keyword) return;
+                
+                // Disable search button and show loading state
+                searchButton.disabled = true;
+                searchButton.innerHTML = '🔄 Searching...';
+                
+                // Reset results container
+                resultsContainer.innerHTML = `
+                    <div id="search-status">Searching...</div>
+                    <div id="pdf-results"></div>
+                `;
+                
+                const searchStatus = document.getElementById('search-status');
+                const pdfResults = document.getElementById('pdf-results');
+                let resultCount = 0;
+                let allResults = []; // Store all results for sorting
+                
+                try {
+                    const response = await fetch('http://localhost:5000/search', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            keyword: keyword,
+                            max_pages: parseInt(document.getElementById('max-pages').value) || 1
+                        })
+                    });
+                    
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    
+                    while (true) {
+                        const {value, done} = await reader.read();
+                        if (done) break;
+                        
+                        const text = decoder.decode(value);
+                        const lines = text.split('\n').filter(line => line.trim());
+                        
+                        for (const line of lines) {
+                            const data = JSON.parse(line);
+                            
+                            switch (data.type) {
+                                case 'info':
+                                    searchStatus.textContent = data.message;
+                                    break;
+                                    
+                                case 'result':
+                                    resultCount++;
+                                    const pdf = data.pdf;
+                                    
+                                    // Add to results array and sort
+                                    allResults.push(pdf);
+                                    allResults.sort((a, b) => b.relevance_score - a.relevance_score);
+                                    
+                                    // Clear and rebuild results display
+                                    pdfResults.innerHTML = '';
+                                    allResults.forEach(result => {
+                                        const relevancePercent = Math.round(result.relevance_score * 100);
+                                        
+                                        const resultElement = document.createElement('div');
+                                        resultElement.innerHTML = `
+                                            <a href="${result.url}" class="pdf-link" target="_blank">
+                                                <div class="pdf-title">
+                                                    <span>📄</span>
+                                                    <span>${result.title}</span>
+                                                </div>
+                                                <div class="pdf-url">${result.url}</div>
+                                                <span class="relevance-badge">
+                                                    Relevance: ${relevancePercent}%
+                                                </span>
+                                            </a>
+                                        `;
+                                        pdfResults.appendChild(resultElement);
+                                    });
+                                    
+                                    searchStatus.textContent = `Found ${resultCount} PDFs so far...`;
+                                    updateDownloadButton(resultCount);
+                                    break;
+                                    
+                                case 'complete':
+                                    searchStatus.innerHTML = `
+                                        ${resultCount > 0 
+                                            ? `Found ${resultCount} PDFs, sorted by relevance` 
+                                            : 'No PDFs found'}
+                                        <br><small>Search terms used: ${data.used_keywords.join(', ')}</small>
+                                    `;
+                                    break;
+                            }
+                        }
+                    }
+                    
+                    if (resultCount === 0) {
+                        pdfResults.innerHTML = `
+                            <p style="text-align: center; color: var(--discord-muted);">
+                                No PDFs found.<br>
+                                <small>Try using different keywords.</small>
+                            </p>
+                        `;
+                    }
+                    
+                } catch (error) {
+                    resultsContainer.innerHTML = `
+                        <p style="color: red; text-align: center">
+                            Error connecting to server. Please make sure the server is running.
+                        </p>`;
+                } finally {
+                    // Re-enable search button and restore original text
+                    searchButton.disabled = false;
+                    searchButton.innerHTML = '🔍 Search PDFs';
+                }
+            }
+
+            // Add event listeners
+            searchButton.addEventListener('click', performSearch);
+            
+            // Add enter key support
+            keywordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+
+            const downloadAllButton = document.getElementById('download-all');
+            
+            function updateProgress(percent) {
+                const progressBar = document.querySelector('.progress-bar');
+                progressBar.style.width = `${percent}%`;
+                progressBar.textContent = `${Math.round(percent)}%`;
+                
+                // Update progress bar color based on percentage
+                if (percent >= 100) {
+                    progressBar.className = 'progress-bar progress-green';
+                } else if (percent >= 90) {
+                    progressBar.className = 'progress-bar progress-blue';
+                } else if (percent >= 50) {
+                    progressBar.className = 'progress-bar progress-yellow';
+                } else {
+                    progressBar.className = 'progress-bar progress-red';
+                }
+            }
+
+            async function downloadAllPDFs() {
+                const progressWrapper = document.getElementById('progress-container');
+                const progressBar = progressWrapper.querySelector('.progress-bar');
+                const statusText = progressWrapper.querySelector('.download-status-text');
+                const downloadAllButton = document.getElementById('download-all');
+                
+                progressWrapper.style.display = 'block';
+                downloadAllButton.disabled = true;
+                downloadAllButton.innerHTML = '📥 Downloading...';
+                
+                try {
+                    const urls = Array.from(document.querySelectorAll('.pdf-link'))
+                        .map(link => link.href);
+                        
+                    if (urls.length === 0) {
+                        throw new Error('No PDFs to download');
+                    }
+                    
+                    statusText.textContent = 'Downloading PDFs...';
+                    updateProgress(50);  // Show some progress while downloading
+                    
+                    const response = await fetch('http://localhost:5000/download-all', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ urls: urls })
+                    });
+                    
+                    if (!response.ok) throw new Error('Download failed');
+                    
+                    // Get the blob directly
+                    const blob = await response.blob();
+                    const downloadUrl = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.download = 'pdfs.zip';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(downloadUrl);
+                    
+                    updateProgress(100);
+                    statusText.textContent = 'Download complete!';
+                    statusText.style.color = 'var(--discord-green)';
+                    
+                    setTimeout(() => {
+                        progressWrapper.style.display = 'none';
+                        statusText.style.color = 'var(--discord-text)';
+                    }, 3000);
+                    
+                } catch (error) {
+                    progressBar.className = 'progress-bar progress-red';
+                    progressBar.style.width = '100%';
+                    progressBar.textContent = 'Error';
+                    statusText.textContent = `Error: ${error.message}`;
+                    statusText.style.color = 'red';
+                    console.error('Download error:', error);
+                } finally {
+                    downloadAllButton.disabled = false;
+                    downloadAllButton.innerHTML = '📥 Download All';
+                }
+            }
+            
+            downloadAllButton.addEventListener('click', downloadAllPDFs);
+            
+            function updateDownloadButton(resultCount) {
+                downloadAllButton.style.display = resultCount > 0 ? 'block' : 'none';
+                downloadAllButton.disabled = resultCount === 0;
+            }
+        });
+    </script>
+</body>
+</html> 
