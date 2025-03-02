@@ -104,6 +104,36 @@ python server.py
 - 🔔 Download notifications
 - 📊 Download progress visualization
 
+## Support & Community
+
+### GitHub Issues
+- 🐛 Report bugs and issues through our [GitHub Issues](https://github.com/PDF-Farmer/issues)
+- 💡 Submit feature requests and suggestions
+- 📝 View existing issues and their status
+
+### Discussion Forums
+- 💬 Join our [GitHub Discussions](https://github.com/PDF-Farmer/discussions) for:
+  - Q&A and troubleshooting
+  - Feature requests and ideas
+  - Share your use cases
+  - Connect with other users
+
+### Documentation
+- 📚 Check our [Wiki](https://github.com/PDF-Farmer/wiki) for:
+  - Detailed setup guides
+  - Troubleshooting tips
+  - Best practices
+  - API documentation
+
+### Stay Updated
+- ⭐ Star the repository to receive notifications about major updates
+- 👀 Watch the repository for detailed activity updates
+- 🔔 Follow our [Release Notes](https://github.com/PDF-Farmer/releases) for version updates
+
+### Contributing
+- 🤝 We welcome contributions! See our [Contributing Guide](CONTRIBUTING.md)
+- 🌟 Check out our [Good First Issues](https://github.com/PDF-Farmer/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to get started
+
 ## License
 
 This project is open source and available under the MIT License. 
