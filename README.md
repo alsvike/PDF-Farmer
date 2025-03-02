@@ -1,6 +1,8 @@
-# PDF Farmer 0.5
+# PDF Farmer
 
 PDF Farmer is a web application that helps you find and download PDF documents from across the internet based on your search keywords. It features an intelligent search algorithm that ranks results by relevance and provides a modern, Discord-inspired user interface.
+
+###Current Version: 0.5 (Early Development Stage)
 
 ## Features
 
