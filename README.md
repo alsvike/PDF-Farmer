@@ -1,7 +1,7 @@
 # PDF Farmer
 
-PDF Farmer is a web application that helps you find and download PDF documents from across the internet based on your search keywords. It features an intelligent search algorithm that ranks results by relevance and provides a modern, Discord-inspired user interface.
-###### Current Version: 0.5 (Early Development Stage)
+PDF Farmer is a web application that helps you find and download PDF documents from across the internet based on your search keywords. It features an intelligent search algorithm that ranks results by relevance and provides a modern, clean user interface.
+###### Current Version: 1.0
 
 ## Features
 
@@ -9,9 +9,11 @@ PDF Farmer is a web application that helps you find and download PDF documents f
 - 📊 Relevance scoring and ranking of results
 - ⚡ Real-time streaming search results
 - 📥 Bulk download capability for found PDFs
-- 🧠 Intelligent keyword improvement suggestions
-- 🎨 Modern Discord-inspired UI design
+- 🧠 Intelligent keyword improvement with NLP
+- 🎨 Modern, clean UI design with responsive layout
+- 📄 Pagination with customizable results per page (10, 25, 50, 100, or All)
 - 🔄 Rate limiting and request management
+- 🔗 Automatic resolution of redirect URLs
 - ✨ Clean and responsive interface
 
 ## Tech Stack
@@ -43,16 +45,17 @@ python server.py
 
 1. Enter your search keyword in the search box
 2. Adjust the search parameters if needed:
-   - Maximum pages to search
-   - Minimum relevance score
-   - Show/hide low relevance results
-3. Click "Search" to start finding PDFs
-4. Use the "Download All" button to get multiple PDFs at once
+   - Maximum pages to search (1-20)
+   - Enable/disable NLP keyword improvement
+3. Click "Search PDFs" to start finding PDFs
+4. Browse through paginated results (10, 25, 50, 100, or All per page)
+5. Use the "Download All" button to get all PDFs at once
 
 ## Project Structure
 
 - `server.py`: Backend Flask server with PDF search and download logic
-- `index.html`: Frontend interface with Discord-inspired design
+- `index.html`: Frontend interface with modern, responsive design
+- `server-original.py`: Original version of the server for reference
 
 ## Features in Detail
 
@@ -61,6 +64,7 @@ python server.py
 - Intelligent rate limiting
 - Duplicate URL detection
 - PDF verification
+- Redirect URL resolution
 
 ### Relevance Scoring
 - TF-IDF vectorization
@@ -71,6 +75,19 @@ python server.py
 - Synonym expansion
 - Context analysis
 - Search term optimization
+
+### Pagination System
+- Customizable results per page (10, 25, 50, 100, or All)
+- Previous/Next navigation
+- Page indicator
+- Responsive design for all screen sizes
+
+### Modern UI
+- Clean, light design with modern color palette
+- Responsive layout for desktop and mobile devices
+- Subtle animations and transitions
+- Improved typography with Google Fonts (Inter)
+- Enhanced visual hierarchy
 
 ## Known Issues
 
@@ -92,17 +109,16 @@ python server.py
 - 🔄 Batch processing optimization
 
 ### New Features
-- 📱 Mobile-responsive design improvements
+- 📱 Further mobile-responsive design improvements
 - 🔍 Advanced search filters (by date, size, search engine)
 - 📂 Custom download directory selection
 - 💾 Save search results for later
 - 📈 Search history and analytics
-
-### UI Enhancements
-- 🎨 Dark/Light theme toggle
-- 📱 Better mobile experience
-- 🔔 Download notifications
-- 📊 Download progress visualization
+- 🌓 Dark/Light theme toggle
+- 🔍 PDF preview functionality
+- 📋 Batch operations for selected PDFs
+- 📤 Export and sharing options
+- 🔒 Offline functionality
 
 ## Support & Community
 
